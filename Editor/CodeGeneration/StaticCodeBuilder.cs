@@ -228,26 +228,29 @@ namespace ";
 
     public class AddDynamicColliders : MonoBehaviour
     {
-        public List<string> paths = new List<string>();
+        public List<PathPair> pathPairs = new List<PathPair>();
 
         public void Awake()
         {
             var mdl = GetComponentInParent<ModelSkinController>().transform;
-            var allColliders = new List<DynamicBoneCollider>();
-            foreach (var path in paths)
+
+            foreach (var pair in pathPairs)
             {
-                var obj = mdl.Find(path);
-                if (obj)
+                var boneObj = pair.path1 == string.Empty ? transform : transform.Find(pair.path1);
+                var colliderObj = mdl.Find(pair.path2);
+                if (boneObj && colliderObj && boneObj.TryGetComponent(out DynamicBone dynamicBone) && colliderObj.TryGetComponent(out DynamicBoneCollider boneCollider))
                 {
-                    allColliders.AddRange(obj.GetComponents<DynamicBoneCollider>());
+                    dynamicBone.m_Colliders.Add(boneCollider);
                 }
             }
-
-            foreach (var dynamicSkin in GetComponents<DynamicBone>())
-            {
-                dynamicSkin.m_Colliders.AddRange(allColliders);
-            }
         }
+    }    
+
+    [Serializable]
+    public struct PathPair
+    {
+        public string path1;
+        public string path2;
     }";
     }
 }

@@ -41,7 +41,7 @@ namespace RoRSkinBuilder.Data
         [ShowWhen(nameof(spawnPrefabOnModelObject), false, true)]
         public bool addBonesToRenderers;
         [ShowWhen(nameof(spawnPrefabOnModelObject), false, true)]
-        public PathListWrapper dynamicBonesColliderPaths;
+        public ColliderPathPairListWrapper dynamicBonesColliderPaths;
         public string enableFromConfig;
 
         public string EnableFromConfig => enableFromConfig;

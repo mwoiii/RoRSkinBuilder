@@ -676,9 +676,9 @@ namespace RoRSkinBuilder
                             {
                                 code.L(".WithComponent<AddDynamicColliders>(c => ")
                                     .O();
-                                foreach (var path in activation.dynamicBonesColliderPaths)
+                                foreach (var pathPair in activation.dynamicBonesColliderPaths)
                                 {
-                                    code.L("c.paths.Add(@\"").A(path).A("\");");
+                                    code.L("c.pathPairs.Add(new PathPair() { path1 = @\"").A(pathPair.prefabDynamicBonePath).A("\", path2 = @\"").A(pathPair.modelDynamicBoneColliderPath).A("\" });");
                                 }
                                 code.C().A(")");
                             }
