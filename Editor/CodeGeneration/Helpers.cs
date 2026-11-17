@@ -100,6 +100,10 @@ namespace RoRSkinBuilder
 
         private static void GatherBonesInfo(BoneInfo parent, Transform referenceTransform, Transform prefabTransform, InsertBonesInfo info, SkinnedMeshRenderer[] renderers)
         {
+            if (prefabTransform == null) {
+                throw new NullReferenceException($"Hierarchy discrepency detected - couldn't find a bone with name \"{referenceTransform.name}\" in the correct position the reference model!");
+            }
+
             if (!info.renderer)
             {
                 foreach (var renderer in renderers)

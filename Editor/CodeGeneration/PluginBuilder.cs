@@ -414,19 +414,6 @@ namespace RoRSkinBuilder
                 .L("var renderers = mdl.GetComponentsInChildren<Renderer>(true);")
                 .L("var lights = mdl.GetComponentsInChildren<Light>(true);");
 
-            if (skin.GameObjectActivations.Any(a => a.spawnPrefabOnModelObject && a.addBonesToRenderers))
-            {
-                code
-                    .L("var skinnedRendererPaths = new List<string>();")
-                    .L("foreach (var renderer in renderers)")
-                    .O()
-                        .L("if (renderer is SkinnedMeshRenderer)")
-                        .O()
-                            .L("skinnedRendererPaths.Add(Util.BuildPrefabTransformPath(mdl.transform, renderer.transform, false, false));")
-                        .C()
-                    .C();
-            }
-
             code.L()
                 .L("var skin = ScriptableObject.CreateInstance<SkinDef>();")
                 .L("var skinParams = ScriptableObject.CreateInstance<SkinDefParams>();")
@@ -434,13 +421,33 @@ namespace RoRSkinBuilder
                 .L("skin.name = ").Literal(name).A(";")
                 .L("skin.nameToken = ").Literal(nameToken).A(";")
                 .L("skin.rootObject = mdl;");
+			
+			var shouldUpdateRenderers = skin.GameObjectActivations.Any(a => a.spawnPrefabOnModelObject && a.addBonesToRenderers);			
+			if (shouldUpdateRenderers)
+            {
+                code.L("var skinnedRendererPaths = new List<string>();");
+            }
 
             BuildSkinIcon(parentSkin);
             BuildSkinUnlockable(parentSkin);
             BuildSkinBaseSkins(skin, parentSkin);
-            BuildSkinGameObjectActivations(skin, parentSkin);
             BuildSkinRendererInfos(skin, parentSkin);
             BuildSkinMeshReplacements(skin, parentSkin);
+			
+            if (shouldUpdateRenderers)
+            {
+                code.L()
+                    .L("foreach (var meshReplacement in skinParams.meshReplacements)")
+                    .O()
+                        .L("if (meshReplacement.renderer is SkinnedMeshRenderer)")
+                        .O()
+                            .L("skinnedRendererPaths.Add(Util.BuildPrefabTransformPath(mdl.transform, meshReplacement.renderer.transform, false, false));")
+                        .C()
+                    .C()
+					.L();
+            }
+			
+            BuildSkinGameObjectActivations(skin, parentSkin);
             BuildSkinLightInfos(skin, parentSkin);
             BuildSkinMinionSkinReplacements(skin, parentSkin);
             BuildSkinProjectileGhostReplacements(skin, parentSkin);
